@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Poppins;
+}
+
+:root {
+    --main-width: 90vw;
+    --main-br: 20px;
+    --main-pd: 12px 15px;
+    --btn-pd: 8px 20px;
+    --main-color: #5840ba;
+    --white-full: #f7f7f7;
+    --secondary-color: #a4db75;
+    --gradient-color: linear-gradient(45deg, #d3adff, #ff38cd);
+    --light: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --dark: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --light-neumorphism: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
+}
+
+body {
+    background-color: var(--white-full);
+}
