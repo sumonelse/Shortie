@@ -3,10 +3,11 @@ import globalEventHandler from "./middlewares/globalEventHandler.js"
 import urlRouter from "./url/urlRouter.js"
 
 const app = express()
+app.use(express.json())
 
 app.get("/", (req, res) => {
     res.json({
-        name: "Sumit",
+        name: "Welcome to URL Shortener",
     })
 })
 
