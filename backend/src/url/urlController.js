@@ -2,9 +2,9 @@ import createHttpError from "http-errors"
 import { nanoid } from "nanoid"
 import urlModel from "./urlModel.js"
 
-const shortURL = async (req, res, next) => {
+const shortOriginalURL = async (req, res, next) => {
     const { longURL } = req.body
-    console.log("longURL", longURL)
+    // console.log("longURL", longURL)
 
     if (!longURL) {
         return next(createHttpError(400, "Please enter a url"))
@@ -50,9 +50,36 @@ const shortURL = async (req, res, next) => {
             return next(error)
         }
 
-        res.status(201).json({
-            message: "Url Shorted successfully",
+        res.status(200).json({
+            success: true,
             shortURL: url,
+        })
+    } catch (error) {
+        console.error(
+            "Error fetching original URL for short code:",
+            shortCode,
+            error
+        )
+        const httpError = createHttpError(500, "Internal server error")
+        next(httpError)
+    }
+}
+
+const getOriginalURL = async (req, res, next) => {
+    const { shortCode } = req.params
+
+    try {
+        const url = await urlModel.findOne({ shortCode })
+
+        if (!url) {
+            console.warn(`Short code not found: ${shortCode}`)
+            return next(createHttpError(404, "Short code not found"))
+        }
+
+        res.status(200).json({
+            success: true,
+            originalURL: url.originalUrl,
+            shortCode: shortCode,
         })
     } catch (error) {
         console.error("Error fetching URL:", error)
@@ -61,4 +88,4 @@ const shortURL = async (req, res, next) => {
     }
 }
 
-export { shortURL }
+export { shortOriginalURL, getOriginalURL }

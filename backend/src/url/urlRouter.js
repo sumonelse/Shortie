@@ -1,9 +1,10 @@
 import express from "express"
-import { shortURL } from "./urlController.js"
+import { shortOriginalURL, getOriginalURL } from "./urlController.js"
 
 const urlRouter = express.Router()
 
 // ROUTES
-urlRouter.post("/short", shortURL)
+urlRouter.post("/short", shortOriginalURL)
+urlRouter.get("/:shortCode", getOriginalURL)
 
 export default urlRouter
