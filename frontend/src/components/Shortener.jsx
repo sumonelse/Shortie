@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef } from "react"
 
 import "../stylesheets/Shortener.css"
 import URLForm from "./URLForm"
@@ -6,6 +6,12 @@ import { useShortenerContext } from "../context/ShortenerContext"
 
 const Shortener = () => {
     const { shortURL } = useShortenerContext()
+    const urlRef = useRef(null)
+
+    const copyToClipboard = () => {
+        urlRef.current?.select()
+        window.navigator.clipboard.writeText(shortURL)
+    }
 
     return (
         <div className="shortener-wrapper flex flex-col shadow main-br">
@@ -23,8 +29,11 @@ const Shortener = () => {
                         value={shortURL}
                         readOnly
                         className="main-pd url-input"
+                        ref={urlRef}
                     />
-                    <button className="btn">Copy</button>
+                    <button className="btn" onClick={copyToClipboard}>
+                        Copy
+                    </button>
                 </div>
             )}
         </div>
