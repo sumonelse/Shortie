@@ -1,16 +1,21 @@
 import React from "react"
-import Shortener from "./components/Shortener"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import URLShortener from "./components/URLShortener"
 import "./stylesheets/App.css"
-import { ShortenerProvider } from "./context/ShortenerContext"
+import RedirectToOriginalURL from "./components/RedirectToOriginalURL"
 
 const App = () => {
-    return (
-        <div className="main-container flex flex-col justify-center items-center">
-            <ShortenerProvider>
-                <Shortener />
-            </ShortenerProvider>
-        </div>
-    )
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <URLShortener />,
+        },
+        {
+            path: "/:shortCode",
+            element: <RedirectToOriginalURL />,
+        },
+    ])
+    return <RouterProvider router={router} />
 }
 
 export default App

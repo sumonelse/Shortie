@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useShortenerContext } from "../context/ShortenerContext"
 
 const createShortURL = async (longURL, setShortURL) => {
@@ -14,7 +14,7 @@ const createShortURL = async (longURL, setShortURL) => {
 
         const data = await res.json()
         const shortCode = data.shortURL.shortCode
-        // console.log(shortCode)
+
         setShortURL(`http://localhost:5173/${shortCode}`)
     } catch (error) {
         console.log(error)

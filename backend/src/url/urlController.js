@@ -55,11 +55,7 @@ const shortOriginalURL = async (req, res, next) => {
             shortURL: url,
         })
     } catch (error) {
-        console.error(
-            "Error fetching original URL for short code:",
-            shortCode,
-            error
-        )
+        console.error("Error Creating original URL: ", error)
         const httpError = createHttpError(500, "Internal server error")
         next(httpError)
     }
