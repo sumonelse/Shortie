@@ -1,0 +1,16 @@
+.main-pd {
+    padding: var(--main-pd);
+}
+.shadow {
+    box-shadow: var(--shadow);
+}
+.main-br {
+    border-radius: var(--main-br);
+}
+.btn {
+    background-color: var(--main-color);
+    color: var(--secondary-color);
+    padding: var(--main-pd);
+    border-radius: var(--main-br);
+    margin-left: 5px;
+}

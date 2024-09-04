@@ -1,0 +1,39 @@
+.shortener-wrapper {
+    gap: 20px;
+    padding: 30px 20px;
+    min-width: 60vw;
+    max-width: 98vw;
+
+    .intro {
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .sub {
+            color: rgb(139, 139, 139);
+        }
+    }
+
+    & form {
+        width: 100%;
+
+        & label {
+            font-weight: 600;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            gap: 5px;
+
+            & > {
+                width: 100%;
+            }
+        }
+        .url-input {
+            width: 100%;
+            border: 1px solid var(--main-color);
+            border-radius: var(--main-br);
+        }
+    }
+}
