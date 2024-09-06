@@ -8,8 +8,9 @@ const RedirectToOriginalURL = () => {
     useEffect(() => {
         const fetchOriginalURL = async () => {
             try {
+                const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN
                 const response = await fetch(
-                    `http://localhost:3000/api/url/${shortCode}`
+                    `${backendDomain}api/url/${shortCode}`
                 )
 
                 if (!response.ok) {
