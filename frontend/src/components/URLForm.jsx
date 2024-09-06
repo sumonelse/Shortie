@@ -3,7 +3,8 @@ import { useShortenerContext } from "../context/ShortenerContext"
 
 const createShortURL = async (longURL, setShortURL) => {
     try {
-        const endpoint = "http://localhost:3000/api/url/short"
+        const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN
+        const endpoint = `${backendDomain}/api/url/short`
         const res = await fetch(endpoint, {
             method: "POST",
             headers: {
@@ -28,6 +29,7 @@ const URLForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         await createShortURL(longURL, setShortURL)
+        setLongURL("")
     }
 
     return (
