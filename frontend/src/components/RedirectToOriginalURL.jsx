@@ -10,7 +10,7 @@ const RedirectToOriginalURL = () => {
             try {
                 const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN
                 const response = await fetch(
-                    `${backendDomain}api/url/${shortCode}`
+                    `${backendDomain}/api/url/${shortCode}`
                 )
 
                 if (!response.ok) {
