@@ -23,7 +23,7 @@ const Shortener = () => {
             <URLForm />
 
             {shortURL.length > 0 && (
-                <div className="flex all-center mx-auto">
+                <div className="flex gap-2 all-center mx-auto">
                     <input
                         type="text"
                         value={shortURL}

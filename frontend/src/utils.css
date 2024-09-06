@@ -12,6 +12,6 @@
     color: var(--secondary-color);
     padding: var(--main-pd);
     border-radius: var(--main-br);
-    margin-left: 5px;
+    /* margin-left: 5px; */
     cursor: pointer;
 }

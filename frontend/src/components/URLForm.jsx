@@ -38,7 +38,7 @@ const URLForm = () => {
                 <label htmlFor="longURL">
                     <h3>Paste your long link here</h3>
                 </label>
-                <div className="flex">
+                <div className="flex justify-center flex-col gap-2 md:flex-row">
                     <input
                         type="text"
                         id="longURL"
