@@ -16,7 +16,7 @@ const createShortURL = async (longURL, setShortURL) => {
         const data = await res.json()
         const shortCode = data.shortURL.shortCode
 
-        setShortURL(`http://localhost:5173/${shortCode}`)
+        setShortURL(`https://shortie-9fgs.onrender.com/${shortCode}`)
     } catch (error) {
         console.log(error)
     }
