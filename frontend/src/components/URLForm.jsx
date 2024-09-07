@@ -17,6 +17,7 @@ const createShortURL = async (longURL, setShortURL) => {
         const data = await res.json()
         const shortCode = data.shortURL.shortCode
 
+        toast.success("URL Shorted")
         setShortURL(`https://shortie-9fgs.onrender.com/${shortCode}`)
     } catch (error) {
         console.log(error)
@@ -32,7 +33,6 @@ const URLForm = ({ setLoading }) => {
         e.preventDefault()
         setLoading(true)
         await createShortURL(longURL, setShortURL)
-        toast.success("URL Shorted")
         setLongURL("")
         setLoading(false)
     }
@@ -41,7 +41,7 @@ const URLForm = ({ setLoading }) => {
         <form className="flex flex-col" method="POST" onSubmit={handleSubmit}>
             <div className="input-wrapper flex flex-col">
                 <label htmlFor="longURL">
-                    <h3>Paste your long url here</h3>
+                    <h3>Paste your long URL here</h3>
                 </label>
                 <div className="flex justify-center flex-col gap-2 md:flex-row">
                     <input
