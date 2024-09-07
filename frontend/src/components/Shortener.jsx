@@ -4,6 +4,7 @@ import "../stylesheets/Shortener.css"
 import URLForm from "./URLForm"
 import Loading from "./Loading"
 import { useShortenerContext } from "../context/ShortenerContext"
+import toast from "react-hot-toast"
 
 const Shortener = () => {
     const [loading, setLoading] = useState(false)
@@ -13,12 +14,13 @@ const Shortener = () => {
     const copyToClipboard = () => {
         urlRef.current?.select()
         window.navigator.clipboard.writeText(shortURL)
+        toast.success("Copied")
     }
 
     return (
         <div className="shortener-wrapper flex flex-col shadow main-br">
             <div className="intro flex flex-col">
-                <h1>Short your LOOONG Link</h1>
+                <h1>Short your LOOONG URL</h1>
                 <p className="sub">No credit card required.</p>
             </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import toast from "react-hot-toast"
 import { useShortenerContext } from "../context/ShortenerContext"
 
 const createShortURL = async (longURL, setShortURL) => {
@@ -19,6 +20,7 @@ const createShortURL = async (longURL, setShortURL) => {
         setShortURL(`https://shortie-9fgs.onrender.com/${shortCode}`)
     } catch (error) {
         console.log(error)
+        toast.error("Failed to Short the URL")
     }
 }
 
@@ -30,6 +32,7 @@ const URLForm = ({ setLoading }) => {
         e.preventDefault()
         setLoading(true)
         await createShortURL(longURL, setShortURL)
+        toast.success("URL Shorted")
         setLongURL("")
         setLoading(false)
     }
@@ -38,7 +41,7 @@ const URLForm = ({ setLoading }) => {
         <form className="flex flex-col" method="POST" onSubmit={handleSubmit}>
             <div className="input-wrapper flex flex-col">
                 <label htmlFor="longURL">
-                    <h3>Paste your long link here</h3>
+                    <h3>Paste your long url here</h3>
                 </label>
                 <div className="flex justify-center flex-col gap-2 md:flex-row">
                     <input
@@ -53,7 +56,7 @@ const URLForm = ({ setLoading }) => {
                             setLongURL(e.target.value)
                         }}
                     />
-                    <input type="submit" className="btn" value="Shorten Link" />
+                    <input type="submit" className="btn" value="Shorten URL" />
                 </div>
             </div>
         </form>
