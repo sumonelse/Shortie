@@ -12,13 +12,9 @@ const shortOriginalURL = async (req, res, next) => {
 
     try {
         const response = await fetch(longURL, { method: "HEAD" }) // Using HEAD to check existence
+
         if (!response.ok) {
-            return next(
-                createHttpError(
-                    400,
-                    "The provided URL does not exist or is unreachable"
-                )
-            )
+            return next(createHttpError(400, "Please, enter a valid URL"))
         }
 
         const MAX_ATTEMPTS = 5 // Seting a limit to avoid infinite loops
