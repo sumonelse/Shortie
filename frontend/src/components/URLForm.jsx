@@ -22,14 +22,16 @@ const createShortURL = async (longURL, setShortURL) => {
     }
 }
 
-const URLForm = () => {
+const URLForm = ({ setLoading }) => {
     const [longURL, setLongURL] = useState("")
     const { setShortURL } = useShortenerContext()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
         await createShortURL(longURL, setShortURL)
         setLongURL("")
+        setLoading(false)
     }
 
     return (

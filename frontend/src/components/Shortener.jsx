@@ -1,10 +1,12 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 
 import "../stylesheets/Shortener.css"
 import URLForm from "./URLForm"
+import Loading from "./Loading"
 import { useShortenerContext } from "../context/ShortenerContext"
 
 const Shortener = () => {
+    const [loading, setLoading] = useState(false)
     const { shortURL } = useShortenerContext()
     const urlRef = useRef(null)
 
@@ -20,7 +22,9 @@ const Shortener = () => {
                 <p className="sub">No credit card required.</p>
             </div>
 
-            <URLForm />
+            <URLForm setLoading={setLoading} />
+
+            {loading && <Loading />}
 
             {shortURL.length > 0 && (
                 <div className="flex gap-2 all-center mx-auto">
