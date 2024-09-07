@@ -14,4 +14,8 @@
     border-radius: var(--main-br);
     /* margin-left: 5px; */
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn:hover {
+    background-color: #4f4f4f;
 }
