@@ -1,7 +1,9 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import NotFound from "./NotFound"
 
 const RedirectToOriginalURL = () => {
+    const [notFound, setNotFound] = useState(false)
     const { shortCode } = useParams()
     const navigate = useNavigate()
 
@@ -24,19 +26,14 @@ const RedirectToOriginalURL = () => {
                 window.location.href = originalURL
             } catch (error) {
                 console.error("Error fetching original URL:", error)
-                // Handle the error (e.g., show a 404 page)
-                navigate("/404") // Navigate to a 404 page if URL not found
+                setNotFound(true)
             }
         }
 
         fetchOriginalURL()
     }, [shortCode, navigate])
 
-    return (
-        <div>
-            <p>Redirecting...</p>
-        </div>
-    )
+    return <div>{notFound ? <NotFound /> : <p>Redirecting...</p>}</div>
 }
 
 export default RedirectToOriginalURL
