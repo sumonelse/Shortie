@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import NotFound from "./NotFound"
 import "../stylesheets/Redirect.css"
@@ -9,8 +9,18 @@ const RedirectToOriginalURL = () => {
     const [originalURL, setOriginalURL] = useState("")
     const [countdown, setCountdown] = useState(5)
     const [progress, setProgress] = useState(0)
+    const [redirectCancelled, setRedirectCancelled] = useState(false)
+    const countdownIntervalRef = useRef(null)
     const { shortCode } = useParams()
     const navigate = useNavigate()
+
+    // Function to clear the countdown interval
+    const clearCountdownInterval = () => {
+        if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current)
+            countdownIntervalRef.current = null
+        }
+    }
 
     useEffect(() => {
         const fetchOriginalURL = async () => {
@@ -32,20 +42,26 @@ const RedirectToOriginalURL = () => {
                 setOriginalURL(fetchedURL)
                 setLoading(false)
 
-                // Start countdown for automatic redirect
-                let timer = countdown
-                const countdownInterval = setInterval(() => {
-                    timer -= 1
-                    setCountdown(timer)
-                    setProgress(((5 - timer) / 5) * 100)
+                // Only start countdown if redirect hasn't been cancelled
+                if (!redirectCancelled) {
+                    // Start countdown for automatic redirect
+                    let timer = countdown
+                    countdownIntervalRef.current = setInterval(() => {
+                        if (redirectCancelled) {
+                            clearCountdownInterval()
+                            return
+                        }
 
-                    if (timer <= 0) {
-                        clearInterval(countdownInterval)
-                        window.location.href = fetchedURL
-                    }
-                }, 1000)
+                        timer -= 1
+                        setCountdown(timer)
+                        setProgress(((5 - timer) / 5) * 100)
 
-                return () => clearInterval(countdownInterval)
+                        if (timer <= 0) {
+                            clearCountdownInterval()
+                            window.location.href = fetchedURL
+                        }
+                    }, 1000)
+                }
             } catch (error) {
                 console.error("Error fetching original URL:", error)
                 setLoading(false)
@@ -54,15 +70,25 @@ const RedirectToOriginalURL = () => {
         }
 
         fetchOriginalURL()
-    }, [shortCode, navigate])
+
+        // Cleanup function to clear interval when component unmounts
+        return () => {
+            clearCountdownInterval()
+        }
+    }, [shortCode, navigate, redirectCancelled, countdown])
 
     const handleRedirectNow = () => {
         if (originalURL) {
+            // Clear the interval before redirecting
+            clearCountdownInterval()
             window.location.href = originalURL
         }
     }
 
     const handleCancel = () => {
+        // Set redirect cancelled flag and clear the interval
+        setRedirectCancelled(true)
+        clearCountdownInterval()
         navigate("/")
     }
 
