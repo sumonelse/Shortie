@@ -11,6 +11,9 @@ import helmetConfig from "./config/helmet.js"
 
 const app = express()
 
+// Trust proxy - needed for express-rate-limit to work correctly with X-Forwarded-For headers
+app.set("trust proxy", 1)
+
 // Apply middleware
 app.use(
     cors({
