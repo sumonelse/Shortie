@@ -10,7 +10,7 @@ const URLShortener = () => {
             <ShortenerProvider>
                 <header className="app-header">
                     <div className="flex items-center justify-center mb-3">
-                        <Logo size="large" />
+                        <Logo size="xlarge" color="primary" />
                     </div>
                     <h1>
                         <span
