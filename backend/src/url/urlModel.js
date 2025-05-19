@@ -20,6 +20,11 @@ const urlSchema = new mongoose.Schema(
     { versionKey: false }
 )
 
+// Create a unique index on the shortCode field
+urlSchema.index({ shortCode: 1 }, { unique: true })
+// and a non-unique index on the originalUrl field
+urlSchema.index({ originalUrl: 1 })
+
 // Create a model from the schema
 const urlModel = mongoose.model("Url", urlSchema)
 
