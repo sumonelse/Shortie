@@ -4,20 +4,8 @@ import urlModel from "./urlModel.js"
 
 const shortOriginalURL = async (req, res, next) => {
     const { longURL, customSlug } = req.body
-    // console.log("longURL", longURL, "customSlug", customSlug)
-
-    if (!longURL) {
-        return next(createHttpError(400, "Please enter a url"))
-    }
 
     try {
-        // Validate URL format first
-        try {
-            new URL(longURL)
-        } catch (error) {
-            return next(createHttpError(400, "Please enter a valid URL format"))
-        }
-
         // Try to fetch the URL to verify it exists
         try {
             const controller = new AbortController()
@@ -48,17 +36,6 @@ const shortOriginalURL = async (req, res, next) => {
 
         // If a custom slug is provided, check if it's already in use
         if (customSlug) {
-            // Validate custom slug format (only letters, numbers, hyphens, and underscores)
-            const slugPattern = /^[a-zA-Z0-9_-]+$/
-            if (!slugPattern.test(customSlug)) {
-                return next(
-                    createHttpError(
-                        400,
-                        "Custom slug can only contain letters, numbers, hyphens, and underscores"
-                    )
-                )
-            }
-
             // Check if the custom slug already exists
             const existingSlug = await urlModel.findOne({
                 shortCode: customSlug,
