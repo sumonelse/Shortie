@@ -1,46 +1,91 @@
 import createHttpError from "http-errors"
 import { nanoid } from "nanoid"
 import urlModel from "./urlModel.js"
+import { createClient } from "redis"
+
+// Create Redis client
+const redisClient = createClient()
+
+// Connect to Redis
+redisClient.connect().catch((err) => {
+    console.error("Redis connection error:", err)
+})
+
+// Redis connection event handlers
+redisClient.on("connect", () => console.log("Redis client connected"))
+redisClient.on("error", (err) => console.error("Redis client error:", err))
+
+// URL validation using regex instead of network requests
+const isValidUrl = (url) => {
+    try {
+        // Basic URL validation regex
+        const urlPattern = new RegExp(
+            "^(https?:\\/\\/)?" + // protocol
+                "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+                "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                "(\\#[-a-z\\d_]*)?$", // fragment locator
+            "i"
+        )
+        return urlPattern.test(url)
+    } catch (error) {
+        console.error("URL validation error:", error)
+        return false
+    }
+}
 
 const shortOriginalURL = async (req, res, next) => {
     const { longURL, customSlug } = req.body
 
     try {
-        // Try to fetch the URL to verify it exists
-        try {
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-
-            const response = await fetch(longURL, {
-                method: "HEAD",
-                signal: controller.signal,
-            })
-
-            clearTimeout(timeoutId)
-
-            if (!response.ok) {
-                return next(
-                    createHttpError(
-                        400,
-                        "The URL exists but returned an error response"
-                    )
+        // Validate URL format using regex
+        if (!isValidUrl(longURL)) {
+            return next(
+                createHttpError(
+                    400,
+                    "Invalid URL format. Please provide a valid URL."
                 )
-            }
-        } catch (fetchError) {
-            // If fetch fails, we'll still allow the URL but log the error
-            console.warn(
-                `URL validation warning for ${longURL}: ${fetchError.message}`
             )
-            // We don't return an error here, allowing URLs that might be valid but don't respond to HEAD requests
         }
 
         // If a custom slug is provided, check if it's already in use
         if (customSlug) {
-            // Check if the custom slug already exists
+            // Check Redis cache first
+            try {
+                const cachedSlug = await redisClient.get(`slug:${customSlug}`)
+                if (cachedSlug) {
+                    return next(
+                        createHttpError(
+                            409,
+                            "This custom slug is already in use. Please try another one."
+                        )
+                    )
+                }
+            } catch (redisError) {
+                console.warn("Redis cache check failed:", redisError)
+                // Continue with database check if Redis fails
+            }
+
+            // Check database if not in cache
             const existingSlug = await urlModel.findOne({
                 shortCode: customSlug,
             })
+
             if (existingSlug) {
+                // Cache the result for future lookups
+                try {
+                    await redisClient.set(
+                        `slug:${customSlug}`,
+                        existingSlug.originalUrl,
+                        {
+                            EX: 3600, // Cache for 1 hour
+                        }
+                    )
+                } catch (redisError) {
+                    console.warn("Redis cache set failed:", redisError)
+                }
+
                 return next(
                     createHttpError(
                         409,
@@ -54,6 +99,15 @@ const shortOriginalURL = async (req, res, next) => {
                 shortCode: customSlug,
                 originalUrl: longURL,
             })
+
+            // Cache the new URL
+            try {
+                await redisClient.set(`slug:${customSlug}`, longURL, {
+                    EX: 3600, // Cache for 1 hour
+                })
+            } catch (redisError) {
+                console.warn("Redis cache set failed:", redisError)
+            }
 
             return res.status(200).json({
                 success: true,
@@ -69,13 +123,36 @@ const shortOriginalURL = async (req, res, next) => {
 
         while (attempts < MAX_ATTEMPTS) {
             const shortCode = nanoid(urlLen)
-            const shortCodeExist = await urlModel.findOne({ shortCode })
+
+            // Check Redis cache first
+            let shortCodeExist = false
+            try {
+                const cachedUrl = await redisClient.get(`slug:${shortCode}`)
+                shortCodeExist = !!cachedUrl
+            } catch (redisError) {
+                console.warn("Redis cache check failed:", redisError)
+            }
+
+            // If not in cache, check database
+            if (!shortCodeExist) {
+                shortCodeExist = await urlModel.findOne({ shortCode })
+            }
 
             if (!shortCodeExist) {
                 url = await urlModel.create({
                     shortCode,
                     originalUrl: longURL,
                 })
+
+                // Cache the new URL
+                try {
+                    await redisClient.set(`slug:${shortCode}`, longURL, {
+                        EX: 3600, // Cache for 1 hour
+                    })
+                } catch (redisError) {
+                    console.warn("Redis cache set failed:", redisError)
+                }
+
                 break
             }
 
@@ -106,11 +183,37 @@ const getOriginalURL = async (req, res, next) => {
     const { shortCode } = req.params
 
     try {
+        // Check Redis cache first
+        try {
+            const cachedUrl = await redisClient.get(`slug:${shortCode}`)
+            if (cachedUrl) {
+                return res.status(200).json({
+                    success: true,
+                    originalURL: cachedUrl,
+                    shortCode: shortCode,
+                    fromCache: true,
+                })
+            }
+        } catch (redisError) {
+            console.warn("Redis cache get failed:", redisError)
+            // Continue with database lookup if Redis fails
+        }
+
+        // If not in cache, check database
         const url = await urlModel.findOne({ shortCode })
 
         if (!url) {
             console.warn(`Short code not found: ${shortCode}`)
             return next(createHttpError(404, "Short code not found"))
+        }
+
+        // Cache the result for future lookups
+        try {
+            await redisClient.set(`slug:${shortCode}`, url.originalUrl, {
+                EX: 3600, // Cache for 1 hour
+            })
+        } catch (redisError) {
+            console.warn("Redis cache set failed:", redisError)
         }
 
         res.status(200).json({
