@@ -2,16 +2,27 @@ import React from "react"
 import { Toaster } from "react-hot-toast"
 import Shortener from "./Shortener"
 import { ShortenerProvider } from "../context/ShortenerContext"
+import Logo from "./Logo"
 
 const URLShortener = () => {
     return (
         <div className="main-container flex flex-col justify-center items-center">
             <ShortenerProvider>
                 <header className="app-header">
-                    <h1>URL Shortener</h1>
+                    <div className="flex items-center justify-center mb-3">
+                        <Logo size="large" />
+                    </div>
+                    <h1>
+                        <span
+                            className="text-primary-color"
+                            style={{ color: "var(--primary-color)" }}
+                        >
+                            Shortie - An URL SHORTENER
+                        </span>
+                    </h1>
                     <p>
                         Transform long, unwieldy links into clean, manageable
-                        URLs
+                        URLs in seconds
                     </p>
                 </header>
                 <Shortener />

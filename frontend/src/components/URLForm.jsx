@@ -2,7 +2,12 @@ import React, { useState } from "react"
 import toast from "react-hot-toast"
 import { useShortenerContext } from "../context/ShortenerContext"
 
-const createShortURL = async (longURL, setShortURL, addToHistory) => {
+const createShortURL = async (
+    longURL,
+    customSlug,
+    setShortURL,
+    addToHistory
+) => {
     try {
         // Validate URL format
         if (!longURL.match(/^(http|https):\/\/[^ "]+$/)) {
@@ -13,13 +18,18 @@ const createShortURL = async (longURL, setShortURL, addToHistory) => {
         }
 
         const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN
+        const frontendDomain = import.meta.env.VITE_FRONTEND_DOMAIN
         const endpoint = `${backendDomain}/api/url/short`
+
+        // Prepare request body based on whether a custom slug is provided
+        const requestBody = customSlug ? { longURL, customSlug } : { longURL }
+
         const res = await fetch(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ longURL }),
+            body: JSON.stringify(requestBody),
         })
 
         if (!res.ok) {
@@ -28,7 +38,7 @@ const createShortURL = async (longURL, setShortURL, addToHistory) => {
 
         const data = await res.json()
         const shortCode = data.shortURL.shortCode
-        const fullShortUrl = `https://shortie-9fgs.onrender.com/${shortCode}`
+        const fullShortUrl = `${frontendDomain}/${shortCode}`
 
         toast.success("URL shortened successfully!", {
             icon: "🔗",
@@ -50,12 +60,35 @@ const createShortURL = async (longURL, setShortURL, addToHistory) => {
 
 const URLForm = ({ setLoading }) => {
     const [longURL, setLongURL] = useState("")
+    const [customSlug, setCustomSlug] = useState("")
+    const [showCustomSlug, setShowCustomSlug] = useState(false)
     const [isValidURL, setIsValidURL] = useState(true)
+    const [isValidSlug, setIsValidSlug] = useState(true)
     const { setShortURL, addToHistory, setIsLoading } = useShortenerContext()
+
+    const VITE_FRONTEND_DOMAIN = import.meta.env.VITE_FRONTEND_DOMAIN
 
     const validateURL = (url) => {
         const pattern = /^(http|https):\/\/[^ "]+$/
         return pattern.test(url)
+    }
+
+    const validateSlug = (slug) => {
+        // Allow only letters, numbers, hyphens, and underscores
+        const pattern = /^[a-zA-Z0-9_-]+$/
+        return pattern.test(slug)
+    }
+
+    const handleSlugChange = (e) => {
+        const slug = e.target.value
+        setCustomSlug(slug)
+
+        // Only validate if there's input
+        if (slug.length > 0) {
+            setIsValidSlug(validateSlug(slug))
+        } else {
+            setIsValidSlug(true)
+        }
     }
 
     const handleURLChange = (e) => {
@@ -81,13 +114,32 @@ const URLForm = ({ setLoading }) => {
             return
         }
 
+        // Validate custom slug if it's being used
+        if (showCustomSlug && customSlug && !validateSlug(customSlug)) {
+            setIsValidSlug(false)
+            toast.error(
+                "Custom slug can only contain letters, numbers, hyphens, and underscores"
+            )
+            return
+        }
+
         setLoading(true)
         setIsLoading(true)
 
-        const success = await createShortURL(longURL, setShortURL, addToHistory)
+        // Only pass the custom slug if it's being shown and has a value
+        const slugToUse = showCustomSlug && customSlug ? customSlug : null
+        const success = await createShortURL(
+            longURL,
+            slugToUse,
+            setShortURL,
+            addToHistory
+        )
 
         if (success) {
             setLongURL("")
+            if (showCustomSlug) {
+                setCustomSlug("")
+            }
         }
 
         setLoading(false)
@@ -96,16 +148,31 @@ const URLForm = ({ setLoading }) => {
 
     const handlePaste = async () => {
         try {
-            const text = await navigator.clipboard.readText()
-            setLongURL(text)
+            // Check if Clipboard API is available
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                const text = await navigator.clipboard.readText()
+                setLongURL(text)
 
-            // Validate the pasted URL
-            if (text.length > 0) {
-                setIsValidURL(validateURL(text))
+                // Validate the pasted URL
+                if (text.length > 0) {
+                    setIsValidURL(validateURL(text))
+                }
+            } else {
+                // Fallback for browsers without Clipboard API
+                toast.error(
+                    "Clipboard access not supported in your browser. Please paste manually."
+                )
+
+                // Focus the input field so user can paste manually
+                document.getElementById("longURL").focus()
             }
         } catch (err) {
             console.error("Failed to read clipboard contents: ", err)
-            toast.error("Unable to paste from clipboard")
+            toast.error(
+                "Unable to paste from clipboard. Please paste manually."
+            )
+            // Focus the input field so user can paste manually
+            document.getElementById("longURL").focus()
         }
     }
 
@@ -184,6 +251,95 @@ const URLForm = ({ setLoading }) => {
                     </button>
                 </div>
             </div>
+            <div className="custom-slug-toggle mt-3">
+                <button
+                    type="button"
+                    className="text-sm flex items-center gap-1 text-primary-color hover:underline"
+                    onClick={() => setShowCustomSlug(!showCustomSlug)}
+                    style={{ color: "var(--primary-color)" }}
+                >
+                    {showCustomSlug ? (
+                        <>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                            Hide custom slug options
+                        </>
+                    ) : (
+                        <>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                    clipRule="evenodd"
+                                />
+                            </svg>
+                            Customize your short link
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {showCustomSlug && (
+                <div className="custom-slug-input mt-3">
+                    <label
+                        htmlFor="customSlug"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                        Custom slug (optional)
+                    </label>
+                    <div className="flex items-center">
+                        <span className="text-gray-500 mr-2">
+                            {`${VITE_FRONTEND_DOMAIN}`}/
+                        </span>
+                        <div className="flex-grow">
+                            <input
+                                type="text"
+                                id="customSlug"
+                                name="customSlug"
+                                placeholder="my-custom-link"
+                                className={`url-input w-full ${
+                                    !isValidSlug ? "border-red-500" : ""
+                                }`}
+                                value={customSlug}
+                                onChange={handleSlugChange}
+                                aria-invalid={!isValidSlug}
+                                aria-describedby={
+                                    !isValidSlug ? "slug-error" : undefined
+                                }
+                            />
+                            {!isValidSlug && (
+                                <p
+                                    id="slug-error"
+                                    className="text-red-500 text-sm mt-1"
+                                >
+                                    Only letters, numbers, hyphens, and
+                                    underscores are allowed
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                        Create a memorable link that's easy to share (e.g.,
+                        "my-event" or "product-launch")
+                    </p>
+                </div>
+            )}
+
             <div className="mt-3 text-sm text-gray-500">
                 <p>
                     Enter any long URL and get a shortened, easy-to-share link

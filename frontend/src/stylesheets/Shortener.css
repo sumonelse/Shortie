@@ -16,11 +16,16 @@
 .intro h1 {
     font-size: 2.2rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--text-color);
     margin-bottom: 0.5rem;
+}
+
+.text-gradient {
     background: linear-gradient(90deg, var(--primary-color), #818cf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
 .intro .sub {
@@ -62,6 +67,74 @@ form label {
     min-width: 100px;
 }
 
+.custom-slug-toggle button {
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.custom-slug-toggle button:hover {
+    opacity: 0.8;
+}
+
+.custom-slug-input {
+    background-color: var(--light-gray);
+    padding: 1rem;
+    border-radius: var(--main-br);
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.share-buttons {
+    margin-top: 1rem;
+}
+
+.share-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    transition: var(--transition);
+    transform: scale(1);
+}
+
+.share-button:hover {
+    transform: scale(1.1);
+}
+
+.share-button.twitter {
+    background-color: #1da1f2;
+}
+
+.share-button.facebook {
+    background-color: #4267b2;
+}
+
+.share-button.linkedin {
+    background-color: #0077b5;
+}
+
+.share-button.email {
+    background-color: #ea4335;
+}
+
+.share-button.whatsapp {
+    background-color: #25d366;
+}
+
 @media (max-width: 768px) {
     .shortener-wrapper {
         padding: 30px 20px;
@@ -69,5 +142,10 @@ form label {
 
     .intro h1 {
         font-size: 1.8rem;
+    }
+
+    .share-button {
+        width: 32px;
+        height: 32px;
     }
 }

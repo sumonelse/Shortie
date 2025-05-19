@@ -1,0 +1,127 @@
+.qr-code-container {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.qr-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--main-br);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.qr-toggle-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.qr-code-wrapper {
+    background-color: var(--light-gray);
+    border-radius: var(--main-br);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.qr-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.qr-code-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.qr-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    transition: var(--transition);
+}
+
+.qr-close-btn:hover {
+    color: var(--text-color);
+}
+
+.qr-code-display {
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    padding: 1rem;
+    border-radius: var(--main-br);
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.qr-code-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.qr-size-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.qr-size-control label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.qr-size-control input {
+    flex-grow: 1;
+    accent-color: var(--primary-color);
+}
+
+.qr-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--main-br);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+}
+
+.qr-download-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 640px) {
+    .qr-code-wrapper {
+        padding: 1rem;
+    }
+}

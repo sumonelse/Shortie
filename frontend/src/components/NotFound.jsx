@@ -1,9 +1,13 @@
 import React from "react"
 import { Link } from "react-router-dom"
+import Logo from "./Logo"
 
 const NotFound = () => {
     return (
         <div className="h-screen w-screen flex flex-col gap-5 items-center justify-center bg-gray-50">
+            <div className="mb-4">
+                <Logo size="large" />
+            </div>
             <div className="text-center">
                 <h2
                     className="text-7xl font-bold text-primary-color mb-2"
@@ -13,8 +17,8 @@ const NotFound = () => {
                 </h2>
                 <div className="text-xl mb-4">Oops! This URL doesn't exist</div>
                 <p className="text-gray-600 max-w-md mx-auto mb-6">
-                    The link you're looking for may have been removed, renamed,
-                    or is temporarily unavailable.
+                    The Shortie link you're looking for may have been removed,
+                    renamed, or is temporarily unavailable.
                 </p>
             </div>
             <Link to={"/"} className="btn flex items-center gap-2">
@@ -30,8 +34,13 @@ const NotFound = () => {
                         clipRule="evenodd"
                     />
                 </svg>
-                Back to Homepage
+                Back to Shortie Homepage
             </Link>
+            <div className="mt-8 text-center text-sm text-gray-500">
+                <p>
+                    © {new Date().getFullYear()} Shortie. All rights reserved.
+                </p>
+            </div>
         </div>
     )
 }
