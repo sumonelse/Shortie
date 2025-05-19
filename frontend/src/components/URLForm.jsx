@@ -33,7 +33,11 @@ const createShortURL = async (
         })
 
         if (!res.ok) {
-            throw new Error("Server responded with an error")
+            // Parse the error response to get the detailed message
+            const errorData = await res.json()
+            throw new Error(
+                errorData.message || "Server responded with an error"
+            )
         }
 
         const data = await res.json()
@@ -53,7 +57,10 @@ const createShortURL = async (
         return true
     } catch (error) {
         console.error("Error shortening URL:", error)
-        toast.error("Failed to shorten the URL. Please try again.")
+        // Display the specific error message from the server
+        toast.error(
+            error.message || "Failed to shorten the URL. Please try again."
+        )
         return false
     }
 }

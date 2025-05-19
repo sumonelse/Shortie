@@ -32,7 +32,9 @@ const RedirectToOriginalURL = () => {
                 )
 
                 if (!response.ok) {
-                    throw new Error("URL not found")
+                    // Parse the error response to get the detailed message
+                    const errorData = await response.json()
+                    throw new Error(errorData.message || "URL not found")
                 }
 
                 const data = await response.json()
