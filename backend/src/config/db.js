@@ -11,7 +11,12 @@ const connectDB = async () => {
             console.log("Error in connecting to DATABASE", err)
         })
 
-        await mongoose.connect(config.dbURL)
+        await mongoose.connect(config.dbURL, {
+            maxPoolSize: 10,
+            minPoolSize: 5,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        })
     } catch (err) {
         console.log("Failed to connect to DATABASE")
         process.exit(1)
