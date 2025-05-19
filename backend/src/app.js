@@ -1,20 +1,25 @@
 import express from "express"
 import cors from "cors"
 import compression from "compression"
+import helmet from "helmet"
 import globalEventHandler, {
     notFoundHandler,
 } from "./middlewares/globalEventHandler.js"
 import urlRouter from "./url/urlRouter.js"
 import { config } from "./config/config.js"
+import helmetConfig from "./config/helmet.js"
 
 const app = express()
 
 // Apply middleware
 app.use(
     cors({
-        origin: config.frontendDomain,
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        origin: config.security.cors.allowedOrigins,
+        methods: config.security.cors.allowedMethods,
+        allowedHeaders: config.security.cors.allowedHeaders,
+        exposedHeaders: config.security.cors.exposedHeaders,
+        maxAge: config.security.cors.maxAge,
+        credentials: true, // Allow cookies to be sent with requests
     })
 )
 
@@ -36,23 +41,8 @@ app.use(
 
 app.use(express.json())
 
-// Add security headers
-app.use((req, res, next) => {
-    // Protect against XSS attacks
-    res.setHeader("X-XSS-Protection", "1; mode=block")
-    // Prevent MIME type sniffing
-    res.setHeader("X-Content-Type-Options", "nosniff")
-    // Prevent clickjacking
-    res.setHeader("X-Frame-Options", "DENY")
-    // Strict Transport Security (use in production with HTTPS)
-    if (config.env === "production") {
-        res.setHeader(
-            "Strict-Transport-Security",
-            "max-age=31536000; includeSubDomains"
-        )
-    }
-    next()
-})
+// Add security headers with Helmet using our configuration
+app.use(helmet(helmetConfig))
 
 // Health check endpoint
 app.get("/", (req, res) => {

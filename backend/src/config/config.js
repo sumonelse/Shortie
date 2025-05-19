@@ -35,6 +35,25 @@ const _config = {
         level: 6,
         threshold: 0,
     },
+
+    // Security configuration
+    security: {
+        // Cookie settings
+        cookie: {
+            secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+            httpOnly: true, // Prevent client-side JavaScript from accessing cookies
+            sameSite: "strict", // Prevent CSRF attacks
+        },
+
+        // CORS settings (additional to what's in app.js)
+        cors: {
+            allowedOrigins: [process.env.FRONTEND_DOMAIN],
+            allowedMethods: ["GET", "POST", "PUT", "DELETE"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            exposedHeaders: ["Content-Length", "X-Rate-Limit"],
+            maxAge: 86400, // 24 hours in seconds
+        },
+    },
 }
 
 export const config = Object.freeze(_config)
