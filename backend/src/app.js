@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import compression from "compression"
 import globalEventHandler, {
     notFoundHandler,
 } from "./middlewares/globalEventHandler.js"
@@ -16,6 +17,23 @@ app.use(
         allowedHeaders: ["Content-Type", "Authorization"],
     })
 )
+
+// Compress all responses
+app.use(
+    compression({
+        level: 6, // Compression level (0-9, where 9 is maximum compression but slower)
+        threshold: 0, // Compress all responses regardless of size
+        filter: (req, res) => {
+            // Don't compress responses with this header
+            if (req.headers["x-no-compression"]) {
+                return false
+            }
+            // Use compression filter function from the module
+            return compression.filter(req, res)
+        },
+    })
+)
+
 app.use(express.json())
 
 // Add security headers
