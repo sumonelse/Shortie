@@ -3,8 +3,9 @@ import "../stylesheets/Loading.css"
 
 const Loading = () => {
     return (
-        <div className="mx-auto">
+        <div className="loading-container">
             <span className="loader"></span>
+            <p className="loading-text">Shortening your URL...</p>
         </div>
     )
 }
